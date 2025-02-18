@@ -11,14 +11,41 @@ inputs:
   message-text:
     description: 'The text of the message'
     required: true
-  message-theme-color:
-    description: 'The theme color of the message'
+  message-type:
+    description: 'Should be one of Information, Warning, Error, or Success. Default is Information'
     required: false
-    default: '0076D7'
+    default: 'Information' #'0076D7'
+  workflow-url:
+    description: 'The URL of the workflow'
+    required: true
 
 runs:
   using: 'composite'
   steps:
+
+    # Set the theme color based on the message type and save in step output
+    - name: Set theme color
+      id: theme-color
+      run: |
+        case ${{ inputs.message-type }} in
+          Information)
+          echo "themeColor=0076D7" >> $GITHUB_OUTPUT
+          ;;
+          Warning)
+            echo "themeColor=FFA500" >> $GITHUB_OUTPUT
+            ;;
+          Error)
+            echo "themeColor=FF0000" >> $GITHUB_OUTPUT
+            ;;
+          Success)
+            echo "themeColor=008000" >> $GITHUB_OUTPUT
+            ;;
+          *)
+            echo "themeColor=0076D7" >> $GITHUB_OUTPUT
+            ;;
+        esac
+    
+
     - name: Send message to Teams
       shell: bash
       run: |
@@ -26,7 +53,16 @@ runs:
           "@type": "MessageCard",
           "@context": "http://schema.org/extensions",
           "summary": "${{ inputs.message-title }}",
-          "themeColor": "${{ inputs.message-theme-color }}",
+          "themeColor": "${{ steps.theme-color.outputs.themeColor }}",
           "title": "${{ inputs.message-title }}",
-          "text": "${{ inputs.message-text }}"
+          "text": "${{ inputs.message-text }}",
+          "potentialAction": [
+            {
+              "@type": "OpenUri",
+              "name": "View in GitHub",
+              "targets": [
+                { "os": "default", "uri": "${{ inputs.workflow-url }}" }
+              ]
+            }
+          ]
         }' ${{ inputs.webhook-url }}
