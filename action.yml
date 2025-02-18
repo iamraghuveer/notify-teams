@@ -26,6 +26,7 @@ runs:
     # Set the theme color based on the message type and save in step output
     - name: Set theme color
       id: theme-color
+      shell: bash
       run: |
         case ${{ inputs.message-type }} in
           Information)
