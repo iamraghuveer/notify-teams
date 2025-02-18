@@ -12,9 +12,9 @@ inputs:
     description: 'The text of the message'
     required: true
   message-type:
-    description: 'Should be one of Information, Warning, Error, or Success. Default is Information'
+    description: 'Set this input the job.status, Should be one of failed, cancelled, or success. Default is information'
     required: false
-    default: 'Information' #'0076D7'
+    default: 'information' #'0076D7'
   workflow-url:
     description: 'The URL of the workflow'
     required: true
@@ -22,30 +22,28 @@ inputs:
 runs:
   using: 'composite'
   steps:
-
-    # Set the theme color based on the message type and save in step output
     - name: Set theme color
       id: theme-color
       shell: bash
       run: |
-        case ${{ inputs.message-type }} in
-          Information)
-          echo "themeColor=0076D7" >> $GITHUB_OUTPUT
-          ;;
-          Warning)
-            echo "themeColor=FFA500" >> $GITHUB_OUTPUT
+        msg_type=$(echo "${{ inputs.message-type }}" | tr '[:upper:]' '[:lower:]')
+        case "$msg_type" in
+          information)
+            echo "themeColor=0076D7" >> $GITHUB_OUTPUT
             ;;
-          Error)
+          cancelled)
+            echo "themeColor=FF355A" >> $GITHUB_OUTPUT
+            ;;
+          failure)
             echo "themeColor=FF0000" >> $GITHUB_OUTPUT
             ;;
-          Success)
+          success)
             echo "themeColor=008000" >> $GITHUB_OUTPUT
             ;;
           *)
             echo "themeColor=0076D7" >> $GITHUB_OUTPUT
             ;;
         esac
-    
 
     - name: Send message to Teams
       shell: bash
