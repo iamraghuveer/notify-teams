@@ -1,0 +1,32 @@
+name: 'Send Teams Message'
+description: 'Send messages to Teams channel via webhook using Teams cards'
+
+inputs:
+  webhook-url:
+    description: 'The Teams webhook URL'
+    required: true
+  message-title:
+    description: 'The title of the message'
+    required: true
+  message-text:
+    description: 'The text of the message'
+    required: true
+  message-theme-color:
+    description: 'The theme color of the message'
+    required: false
+    default: '0076D7'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send message to Teams
+      shell: bash
+      run: |
+        curl -H 'Content-Type: application/json' -d '{
+          "@type": "MessageCard",
+          "@context": "http://schema.org/extensions",
+          "summary": "${{ inputs.message-title }}",
+          "themeColor": "${{ inputs.message-theme-color }}",
+          "title": "${{ inputs.message-title }}",
+          "text": "${{ inputs.message-text }}"
+        }' ${{ inputs.webhook-url }}

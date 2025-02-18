@@ -1,0 +1,12 @@
+{
+  "name": "notify-teams",
+  "version": "1.0.0",
+  "description": "This action sends a message to a Microsoft Teams channel using a webhook.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
